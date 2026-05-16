@@ -1,0 +1,48 @@
+# Cantor
+
+Interactive music environment. Pattern DSL + wall-clock scheduler + MIDI/Launchpad binding in **Clojure**; synthesis runs in an external `scsynth` (SuperCollider) via **Overtone**.
+
+Successor to [funktor](../funktor) (Haskell). The design transfers; the implementation does not. See `docs/from-funktor.md` for what to reuse and what to leave behind.
+
+## Stack
+
+- **Clojure** (latest stable) — REPL is the live image; no hot-reload gymnastics.
+- **Overtone** — scsynth client, `defsynth` macro, OSC, MIDI, scheduling primitives.
+- **Calva** (VSCode) — editor with `Ctrl+Alt+C Enter` to eval top-level form.
+- **scsynth** — same SuperCollider server you used with funktor.
+
+## Boot
+
+```bash
+# 1. Start scsynth (Overtone can boot it for you)
+clj
+user=> (use 'overtone.live)        ;; boots scsynth on 57110
+
+# 2. Define an instrument
+user=> (definst tone [freq 440 amp 0.5]
+         (* amp (env-gen (perc 0.01 0.3) :action FREE)
+            (sin-osc freq)))
+
+# 3. Play
+user=> (tone 440)
+```
+
+That's it. No build step, no `:reload`, no foreign-store. Edit the file, eval the form, hear the change.
+
+## Architecture
+
+See `docs/architecture.md`. Layered design ported from Funktor with Clojure idioms substituted (atoms for TVars, Overtone for hosc+PortMidi, namespaces for module hierarchy).
+
+## Repo layout
+
+```
+src/cantor/                       Clojure source
+  core/                           Beat / Arc / Event / Stream primitives
+  audio/                          Overtone wrapper + scheduler
+  hardware/                       MIDI + Launchpad Mk3
+  grid/                           Pad ↔ grid model + mode dispatcher
+  live.clj                        REPL entry: play / stop / set-tempo / ...
+synthdefs/                        Reference .scd files (Overtone defsynths live in src/)
+docs/                             Architecture, lessons, design notes
+test/cantor/                      clojure.test specs
+```

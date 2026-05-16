@@ -12,3 +12,13 @@ pom.xml.asc
 .lein-failures
 .nrepl-port
 .cpcache/
+
+# Editor / tooling caches (Calva, clojure-lsp)
+.clj-kondo/.cache/
+.lsp/.cache/
+.lsp/sqlite.*.db
+.lsp/.cache.db
+.calva/
+
+# OS noise
+.DS_Store
